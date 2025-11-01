@@ -1,0 +1,57 @@
+
+# Documentación de Desarrollo: Sistema de Q&A
+
+Este documento describe el proceso de creación del sistema de preguntas y respuestas, las decisiones clave tomadas y la metodología empleada.
+
+## 1. Concepción Inicial del Proyecto
+
+El objetivo inicial era crear un sistema de Q&A simple basado en una base de conocimiento explícita, utilizando redes semánticas o frames. La idea era responder preguntas definicionales como "¿Qué es un Perceptrón?".
+
+- **Frontend:** HTML/CSS
+- **Backend:** Python
+
+## 2. Pivote Estratégico: La Introducción de Datos Reales
+
+El proyecto cambió significativamente cuando se introdujo un conjunto de datos real: un archivo CSV (`linea-mujeres-cdmx-reducido.csv`) con aproximadamente 300,000 registros de llamadas.
+
+**Decisión Clave:** Se analizó el contenido del CSV y se determinó que no era una base de conocimiento con definiciones, sino un registro de transacciones. En lugar de abandonar el dato, se decidió **pivotar el enfoque del proyecto**.
+
+**Nuevo Objetivo:** Pasar de un sistema de Q&A definicional a un **sistema de Q&A analítico**, capaz de realizar consultas sobre los datos y responder preguntas agregadas sobre los registros.
+
+**Compatibilidad con Q&A:** Este enfoque es una forma más avanzada y práctica de un sistema Q&A. En lugar de simplemente recuperar un hecho ("A es B"), el sistema infiere respuestas a partir de un conjunto de datos grande, que es una tarea fundamental en la inteligencia artificial y el análisis de datos.
+
+## 3. Preparación y Filtrado de Datos
+
+Se identificó que trabajar con 300,000 registros en un entorno con 8GB de RAM sería ineficiente para el desarrollo.
+
+1.  **Primer Intento (Descartado):** Se propuso tomar las primeras 1,000 filas. Esto se descartó por ser un método propenso a sesgos.
+
+2.  **Filtro por Relevancia:** Se adoptó la sugerencia de filtrar los datos para incluir únicamente registros de 'CIUDAD DE MÉXICO' y 'ESTADO DE MÉXICO'. Esto creó un subconjunto de datos más coherente y relevante de ~290,000 registros.
+
+3.  **Muestreo Estadístico:** Surgió la pregunta sobre el tamaño de muestra necesario para evitar el sesgo y mantener la confianza estadística. Se discutió que, si bien es una consideración importante para el análisis final, para la **fase de desarrollo de software** es más práctico usar una muestra más pequeña.
+
+4.  **Decisión Final:** Se acordó tomar una **muestra aleatoria de 10,000 registros** del conjunto ya filtrado. Esta decisión representa un excelente equilibrio entre:
+    *   **Representatividad:** Es lo suficientemente grande para contener una buena variedad de los datos.
+    *   **Rendimiento:** Es lo suficientemente pequeño para permitir un desarrollo ágil y rápido en un PC con recursos limitados.
+
+## 4. Elección de Tecnologías
+
+- **Backend:** Se eligió **Python** por su fortaleza en el análisis de datos.
+    - **Flask:** Se seleccionó como micro-framework web por su simplicidad y ligereza, ideal para crear una API RESTful.
+    - **Pandas:** Se convirtió en la librería central del proyecto. Es la herramienta estándar de la industria para la manipulación y análisis de datos en formato tabular (como CSV) y su rendimiento es excelente.
+
+- **Frontend:** Se mantuvo la pila estándar de HTML, CSS y JavaScript para crear una interfaz de usuario limpia y funcional.
+
+- **Entorno:** Se configuró un **entorno virtual de Python** (`.venv`) para aislar las dependencias del proyecto (`Flask`, `pandas`), siguiendo las mejores prácticas de desarrollo en Python.
+
+## 5. Lógica del Backend (Procesamiento de Lenguaje Natural Simplificado)
+
+El núcleo del backend es la función `answer_question` en `app.py`.
+
+- **Enfoque:** Se implementó un sistema básico basado en reglas para interpretar el lenguaje natural.
+- **Funcionamiento:**
+    1.  El texto de la pregunta se convierte a mayúsculas y se divide en palabras (tokens).
+    2.  El sistema busca palabras clave que indiquen una **intención** (ej. 'CUÁNTOS' para contar).
+    3.  Luego, busca palabras que coincidan con **entidades** conocidas en los datos (ej. 'IZTAPALAPA' como municipio, 'PSICOLÓGICO' como servicio).
+    4.  Si encuentra una combinación válida de intención y entidad, traduce la pregunta a una operación de filtrado y conteo con Pandas (ej. `df[df['municipio_usuaria'] == 'IZTAPALAPA'].shape[0]`).
+    5.  Se devuelve una respuesta formateada en lenguaje natural.

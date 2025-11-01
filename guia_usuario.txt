@@ -1,0 +1,93 @@
+
+# Guía de Usuario: Sistema de Q&A
+
+Este documento explica la estructura del proyecto y cómo ponerlo en funcionamiento.
+
+## 1. Estructura del Proyecto
+
+El proyecto está organizado de la siguiente manera:
+
+- `/` (Directorio Raíz)
+  - `app.py`: El corazón de la aplicación. Es el servidor backend escrito en Python con Flask. Contiene la lógica para cargar los datos, procesar preguntas y responderlas.
+  - `data.csv`: El conjunto de datos que utiliza la aplicación. Es una muestra de 10,000 registros filtrados.
+  - `requirements.txt`: Archivo que lista las librerías de Python necesarias para que el proyecto funcione (Flask y Pandas).
+  - `documentacion_desarrollo.txt`: Explica cómo se construyó el proyecto (el archivo que estás leyendo ahora es la guía de usuario).
+  - `guia_usuario.txt`: Este mismo archivo.
+  - `.venv/`: Carpeta que contiene el entorno virtual de Python. Este es un espacio aislado con las librerías del proyecto para no interferir con las del sistema.
+
+- `/templates/`
+  - `index.html`: La estructura de la página web que ves en el navegador.
+
+- `/static/`
+  - `style.css`: Define la apariencia y los estilos de la página web (colores, fuentes, etc.).
+  - `script.js`: Contiene la lógica del frontend. Se encarga de tomar tu pregunta, enviarla al servidor y mostrar la respuesta.
+
+## 2. Requisitos
+
+- **Python 3:** Debes tener Python 3 instalado en tu sistema.
+
+## 3. Pasos para la Instalación y Ejecución
+
+Si necesitaras configurar el proyecto desde cero en otra máquina, estos serían los pasos:
+
+1.  **Abrir una terminal** y navegar a la carpeta del proyecto:
+    ```bash
+    cd "/home/alexis-omar/proyecto sistemas inteligentes"
+    ```
+
+2.  **Crear el entorno virtual** (solo se hace una vez):
+    ```bash
+    python3 -m venv .venv
+    ```
+
+3.  **Activar el entorno virtual:**
+    *   En Linux o macOS:
+        ```bash
+        source .venv/bin/activate
+        ```
+    *   En Windows:
+        ```bash
+        .venv\Scripts\activate
+        ```
+    *Nota: Verás `(.venv)` al principio de la línea de tu terminal si se activó correctamente.*
+
+4.  **Instalar las dependencias** (solo se hace una vez o cuando `requirements.txt` cambia):
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+## 4. Cómo Iniciar la Aplicación (Método Recomendado)
+
+1.  **Abre una terminal** y navega a la carpeta del proyecto:
+    ```bash
+    cd "/home/alexis-omar/proyecto sistemas inteligentes"
+    ```
+
+2.  **Activa el entorno virtual**. Este paso es crucial:
+    ```bash
+    source .venv/bin/activate
+    ```
+    *Nota: Verás `(.venv)` al principio de la línea de tu terminal si se activó correctamente.*
+
+3.  **Ejecuta la aplicación en primer plano** con el siguiente comando:
+    ```bash
+    python3 app.py
+    ```
+
+4.  La terminal mostrará mensajes de Flask y se quedará "ocupada". Esto es normal, significa que el servidor está activo. **No cierres esta terminal.**
+
+5.  Abre tu navegador web y ve a la siguiente dirección para usar la aplicación:
+    **http://localhost:3000**
+
+## 5. Cómo Detener la Aplicación
+
+- Para apagar el servidor, vuelve a la terminal donde se está ejecutando y presiona las teclas **`Ctrl + C`**.
+
+## 6. Ejemplos de Preguntas que Puedes Hacer
+
+El sistema actual es simple y responde mejor a preguntas sobre conteos. Aquí tienes algunos ejemplos:
+
+- ¿Cuántos casos son de IZTAPALAPA?
+- ¿Cuántos registros son de NEZAHUALCOYOTL?
+- ¿Cuántos servicios de JURÍDICO hay?
+- ¿cuántas tematicas de VIOLENCIA hay?

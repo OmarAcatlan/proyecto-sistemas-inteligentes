@@ -1,0 +1,110 @@
+# Próximos Pasos y Sugerencias Futuras
+
+Este documento contiene la corrección final para el código y sugerencias para futuras mejoras.
+
+## 1. Corrección Final para `app.py`
+
+El último cambio que intenté fue cancelado. Para que el sistema reconozca nombres con espacios (como "GUSTAVO A MADERO"), necesitas reemplazar la función `answer_question` en tu archivo `app.py` con el siguiente bloque de código completo.
+
+**Copia y pega esto en `app.py`, reemplazando la función `answer_question` existente:**
+
+```python
+def answer_question(question):
+    """
+    Analiza una pregunta para extraer entidades y traducirla a una consulta de pandas.
+    Es flexible con el orden de las palabras y puede manejar múltiples condiciones.
+    """
+    question_upper = question.upper()
+
+    # Extraer listas de entidades únicas del DataFrame, eliminando valores nulos
+    municipios = df['municipio_usuaria'].dropna().unique()
+    servicios = df['servicio'].dropna().unique()
+    tematicas = df['tematica_1'].dropna().unique()
+
+    # Diccionario para guardar los filtros encontrados
+    filters = {}
+
+    # Identificar entidades buscando la cadena completa en la pregunta
+    for municipio in municipios:
+        if municipio in question_upper:
+            filters['municipio_usuaria'] = municipio
+            break  # Asumimos un solo municipio por pregunta para simplicidad
+
+    for servicio in servicios:
+        if servicio in question_upper:
+            filters['servicio'] = servicio
+            break
+
+    for tematica in tematicas:
+        if tematica in question_upper:
+            filters['tematica_1'] = tematica
+            break
+
+    # Si no se encuentra ninguna entidad, devolver un mensaje por defecto
+    if not filters:
+        return "No pude identificar un municipio, servicio o temática en tu pregunta. Por favor, intenta de nuevo."
+
+    # Construir la consulta de Pandas dinámicamente
+    query_df = df
+    response_parts = []
+    
+    # Aplicar todos los filtros encontrados
+    for column, value in filters.items():
+        query_df = query_df[query_df[column] == value]
+        
+        # Formatear el nombre de la columna para la respuesta
+        column_name_for_response = column.replace('_usuaria', '').replace('_', ' ')
+        response_parts.append(f"para {column_name_for_response} '{value.title()}'")
+
+    count = query_df.shape[0]
+
+    # Construir la respuesta final
+    if count > 0:
+        return f"Encontré {count} registros que coinciden con tu búsqueda: " + " y ".join(response_parts) + "."
+    else:
+        return f"No se encontraron registros para las condiciones: " + " y ".join(response_parts) + "."
+
+```
+
+## 2. Cómo Ejecutar la Aplicación de Forma Estable
+
+Para evitar los problemas de bloqueo del servidor, utiliza el siguiente método para iniciarlo:
+
+1.  **Asegúrate de que no haya otro proceso usando el puerto 3000.**
+    ```bash
+    # Encuentra el proceso con:
+    lsof -i :3000
+    # Detén el proceso con:
+    kill -9 <PID_DEL_PROCESO>
+    ```
+
+2.  **Inicia el servidor con este comando:**
+    ```bash
+    source .venv/bin/activate && python3 -c "from app import app; app.run(host='0.0.0.0', port=3000, debug=False, use_reloader=False)" &
+    ```
+
+## 3. Sugerencias para Integrar Inteligencia Artificial
+
+Tu idea de usar un modelo de IA es el siguiente paso lógico para hacer este proyecto mucho más potente.
+
+#### ¿Cuándo sería conveniente?
+
+Sería ideal empezar a integrarlo cuando la versión actual se quede corta. Es decir, cuando los usuarios quieran hacer preguntas más complejas que el sistema de reglas no puede manejar, como:
+-   **Comparaciones:** "¿Qué municipio tuvo más casos de violencia, Iztapalapa o Benito Juárez?"
+-   **Tendencias:** "¿Aumentaron los servicios jurídicos en el último año?"
+-   **Agregaciones complejas:** "¿Cuál es la edad promedio de las usuarias en Nezahualcóyotl?"
+-   **Flexibilidad total:** Entender sinónimos o abreviaturas ("GAM" -> "GUSTAVO A MADERO").
+
+#### ¿Cómo integrarlo con recursos limitados (8GB RAM, sin GPU)?
+
+La clave es usar librerías ligeras de Procesamiento de Lenguaje Natural (NLP) que se ejecuten localmente sin consumir demasiados recursos.
+
+1.  **Librería Recomendada: `spaCy`**
+    -   Es una librería de NLP moderna, rápida y eficiente. Puedes empezar con su modelo pequeño en español (`es_core_news_sm`), que es ideal para tus recursos.
+
+2.  **Pasos para la Integración:**
+    -   **Paso A: Mejorar el Reconocimiento de Entidades (NER):** En lugar de buscar cadenas de texto, usarías el modelo de `spaCy` para identificar automáticamente lugares, organizaciones, fechas, etc., en la pregunta. Esto es mucho más robusto.
+    -   **Paso B: Análisis de Intención:** El siguiente paso sería determinar qué quiere hacer el usuario. ¿Quiere `contar`, `promediar`, `listar`? Esto se puede hacer buscando palabras clave ("cuántos", "promedio", "lista") y analizando la estructura gramatical de la oración con las herramientas de `spaCy`.
+    -   **Paso C: Mapeo a Pandas:** Con las entidades y la intención extraídas, el siguiente paso es traducir esa información a una consulta de Pandas, de forma similar a como lo hace el código actual, pero con una lógica más avanzada.
+
+Este enfoque híbrido (un modelo de NLP para entender la pregunta y Pandas para consultar los datos) es muy potente y se ajusta bien a un entorno con recursos limitados.

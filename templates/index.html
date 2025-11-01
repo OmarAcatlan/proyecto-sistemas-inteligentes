@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Q&A - CDMX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Preguntas y Respuestas</h1>
+            <p>Consulta los datos de servicios a mujeres en CDMX y Edomex.</p>
+        </header>
+        <div class="chat-box">
+            <div id="response-area" class="response-area">
+                <div class="message bot-message">
+                    <p>Hola, estoy aquí para ayudarte. Puedes preguntarme algo como: <strong>¿Cuántos casos son de Iztapalapa?</strong></p>
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="question-input" placeholder="Escribe tu pregunta aquí...">
+                <button id="ask-button">Enviar</button>
+            </div>
+        </div>
+        <footer>
+            <p>Basado en datos de la Línea Mujeres CDMX.</p>
+        </footer>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
